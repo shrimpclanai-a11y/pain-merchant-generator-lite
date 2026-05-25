@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍤 蝦家班：Blueprint Engine V3 (Generator)</title>
+    <style>
+        :root { --primary: #ff6600; --bg: #0d1117; --card: #161b22; --text: #c9d1d9; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: var(--card); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #30363d; }
+        h1 { color: var(--primary); }
+        input, textarea { width: 100%; background: #010409; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 6px; box-sizing: border-box; }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        pre { background: #010409; padding: 15px; border-radius: 6px; overflow-x: auto; color: #79c0ff; border: 1px solid #30363d; }
+        .label { font-size: 0.9rem; color: #8b949e; margin-bottom: 8px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍤 Blueprint Engine V3</h1>
+        <p>工業化「痛苦圖紙」批量出貨中心</p>
+
+        <div class="card">
+            <span class="label">1. GitHub Repo URL (匯流排)</span>
+            <input type="text" id="repoUrl" value="https://github.com/piziweiwang/openclaw-pain-points" oninput="update()">
+            
+            <span class="label" style="margin-top:15px;">2. 圖紙路徑 (例如: JSONGuard-v1)</span>
+            <input type="text" id="blueprintPath" value="JSONGuard-v1" oninput="update()">
+        </div>
+
+        <div class="card">
+            <h3>🔗 產出：Markdown 一鍵部署按鈕</h3>
+            <p>將以下代碼貼到您的 README.md 中：</p>
+            <pre id="outputMarkdown"></pre>
+            <button class="btn" onclick="copy()">複製 Markdown 代碼</button>
+        </div>
+        
+        <div class="card">
+            <h3>🚀 預覽效果</h3>
+            <div id="previewArea"></div>
+        </div>
+    </div>
+
+    <script>
+        function update() {
+            const repo = document.getElementById('repoUrl').value;
+            const path = document.getElementById('blueprintPath').value;
+            const cleanRepo = repo.replace(/\/$/, "");
+            
+            // 核心邏輯：GitHub 不支援子目錄 Clone，所以我們直接指向 Repo 根目錄
+            // 並在 README 中指引使用者進入子目錄
+            const deepLink = "https://studio.firebase.google.com/import?url=" + encodeURIComponent(cleanRepo);
+            
+            const md = "[![Open in Firebase Studio](https://studio.firebase.google.com/static/images/btn_firebase_studio.svg)](" + deepLink + ")\n\n" +
+                       "> 🍤 **班主提醒**：開啟後請在終端機輸入 `cd " + path + "` 即可開始作業。";
+            
+            document.getElementById('outputMarkdown').innerText = md;
+            document.getElementById('previewArea').innerHTML = '<a href="' + deepLink + '" target="_blank"><img src="https://studio.firebase.google.com/static/images/btn_firebase_studio.svg"></a><br><p style="font-size:0.8rem; color:#888;">(預覽) 開啟後請執行 cd ' + path + '</p>';
+        }
+        
+        function copy() {
+            const text = document.getElementById('outputMarkdown').innerText;
+            navigator.clipboard.writeText(text);
+            alert("已複製到剪貼簿！");
+        }
+        
+        update();
+    </script>
+</body>
+</html>
