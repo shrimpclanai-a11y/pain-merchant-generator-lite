@@ -490,7 +490,12 @@
   <script>
     function update() {
       const repo = document.getElementById('repoUrl').value.trim();
-      const cleanRepo = repo.replace(/\/$/, "");
+      let cleanRepo = repo.replace(/\/$/, "");
+      
+      // Auto-append default branch to bypass potential validation caching issues
+      if (cleanRepo && !cleanRepo.includes("/tree/") && !cleanRepo.includes("/blob/")) {
+        cleanRepo += "/tree/main";
+      }
       
       // IDX Custom Template URL
       const deepLink = "https://idx.google.com/new?template=" + encodeURIComponent(cleanRepo);
@@ -500,11 +505,11 @@
       const armyType = selectedRadio ? selectedRadio.value : 'sapper';
       const armyName = selectedRadio ? selectedRadio.nextElementSibling.querySelector('.option-header').innerText.split(' (')[0] : '工兵大隊';
 
-      const md = "[![Open in Firebase Studio](https://studio.firebase.google.com/static/images/btn_firebase_studio.svg)](" + deepLink + ")\n\n" +
+      const md = "[![Open in Project IDX](https://cdn.idx.dev/btn/open_dark_32.svg)](" + deepLink + ")\n\n" +
                  "> 🍤 **班主提醒**：點擊上方按鈕建立工作區時，可在下拉選單中選擇 **" + armyName + "** 以獲得對應的 AI 代理自動配置。";
       
       document.getElementById('outputMarkdown').textContent = md;
-      document.getElementById('previewArea').innerHTML = '<a href="' + deepLink + '" target="_blank"><img src="https://studio.firebase.google.com/static/images/btn_firebase_studio.svg" alt="Open in Firebase Studio"></a>';
+      document.getElementById('previewArea').innerHTML = '<a href="' + deepLink + '" target="_blank"><img src="https://cdn.idx.dev/btn/open_dark_32.svg" alt="Open in Project IDX"></a>';
     }
 
     function copyCode() {
