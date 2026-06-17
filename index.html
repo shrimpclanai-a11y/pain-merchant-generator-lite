@@ -1,71 +1,539 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍤 蝦家班：Blueprint Engine V3 (Generator)</title>
-    <style>
-        :root { --primary: #ff6600; --bg: #0d1117; --card: #161b22; --text: #c9d1d9; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .card { background: var(--card); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #30363d; }
-        h1 { color: var(--primary); }
-        input, textarea { width: 100%; background: #010409; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 6px; box-sizing: border-box; }
-        .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        pre { background: #010409; padding: 15px; border-radius: 6px; overflow-x: auto; color: #79c0ff; border: 1px solid #30363d; }
-        .label { font-size: 0.9rem; color: #8b949e; margin-bottom: 8px; display: block; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🦐 蝦家班 | Blueprint Engine V3 零成本 AI 代理工場</title>
+  <meta name="description" content="蝦家班工業化「痛苦圖紙」批量出貨中心，基於 Project IDX 的自訂範本，一鍵啟動清爽大軍、工兵大隊與龍蝦小兵。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #ff5d22;
+      --primary-hover: #ff7c4d;
+      --secondary: #00f0ff;
+      --accent: #8a2be2;
+      --bg-dark: #06070c;
+      --card-bg: rgba(20, 22, 33, 0.7);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --text-main: #f0f2f5;
+      --text-muted: #8b98a5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient background blobs */
+    .blob {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      filter: blur(140px);
+      z-index: -1;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .blob-1 {
+      top: -10%;
+      left: -10%;
+      background: var(--primary);
+      animation: float 20s infinite alternate;
+    }
+    .blob-2 {
+      bottom: -10%;
+      right: -10%;
+      background: var(--secondary);
+      animation: float 25s infinite alternate-reverse;
+    }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(50px, 50px) scale(1.1); }
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 93, 34, 0.1);
+      border: 1px solid rgba(255, 93, 34, 0.2);
+      padding: 0.8rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+      box-shadow: 0 8px 32px rgba(255, 93, 34, 0.1);
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      line-height: 1;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      font-weight: 300;
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards with glassmorphism */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #fff;
+    }
+
+    .card-title span {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      width: 6px;
+      height: 20px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.9rem 1.2rem;
+      font-size: 0.95rem;
+      color: #fff;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 12px rgba(255, 93, 34, 0.25);
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Option selection */
+    .option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .option-item {
+      position: relative;
+    }
+
+    .option-item input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+
+    .option-label {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 1.2rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-item input[type="radio"]:checked + .option-label {
+      background: rgba(255, 93, 34, 0.08);
+      border-color: var(--primary);
+      box-shadow: 0 0 12px rgba(255, 93, 34, 0.1);
+    }
+
+    .option-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .option-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Outputs */
+    pre {
+      background: #030407;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: #79c0ff;
+      margin-bottom: 1rem;
+      position: relative;
+      max-height: 180px;
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary) 0%, #ff8142 100%);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 20px rgba(255, 93, 34, 0.2);
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(255, 93, 34, 0.35);
+    }
+
+    .copy-btn:active {
+      transform: translateY(0);
+    }
+
+    .preview-box {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .preview-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+    }
+
+    /* Steps */
+    .steps {
+      margin-top: 3rem;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 24px;
+      padding: 2.5rem;
+    }
+
+    .steps-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .step-card {
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .step-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(255, 93, 34, 0.2);
+    }
+
+    .step-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .step-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🍤 Blueprint Engine V3</h1>
-        <p>工業化「痛苦圖紙」批量出貨中心</p>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
 
-        <div class="card">
-            <span class="label">1. GitHub Repo URL (匯流排)</span>
-            <input type="text" id="repoUrl" value="https://github.com/piziweiwang/openclaw-pain-points" oninput="update()">
-            
-            <span class="label" style="margin-top:15px;">2. 圖紙路徑 (例如: JSONGuard-v1)</span>
-            <input type="text" id="blueprintPath" value="JSONGuard-v1" oninput="update()">
-        </div>
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        <span class="logo">🦐</span>
+      </div>
+      <h1>蝦家班 Blueprint Engine V3</h1>
+      <p class="subtitle">痛苦圖紙一鍵出貨中心 — 基於 Project IDX 的零成本 AI 代理工作區自動配置</p>
+    </header>
 
-        <div class="card">
-            <h3>🔗 產出：Markdown 一鍵部署按鈕</h3>
-            <p>將以下代碼貼到您的 README.md 中：</p>
-            <pre id="outputMarkdown"></pre>
-            <button class="btn" onclick="copy()">複製 Markdown 代碼</button>
-        </div>
+    <div class="grid">
+      <!-- Input Panel -->
+      <div class="card">
+        <div class="card-title"><span></span>1. 設定與客製</div>
         
-        <div class="card">
-            <h3>🚀 預覽效果</h3>
-            <div id="previewArea"></div>
+        <div class="form-group">
+          <label for="repoUrl">GitHub 範本網址 (Custom Template)</label>
+          <input type="text" id="repoUrl" value="https://github.com/shrimpclanai-a11y/pain-merchant-generator-lite" placeholder="輸入您的 GitHub 範本 Repo 網址">
         </div>
+
+        <div class="form-group">
+          <label>選擇預設部隊組合 (預設選取的部署模式)</label>
+          <div class="option-list">
+            
+            <div class="option-item">
+              <input type="radio" name="army_type" id="opt-sapper" value="sapper" checked onchange="update()">
+              <div class="option-label">
+                <div class="option-header">🧠 工兵大隊 (Sapper Brigade)</div>
+                <div class="option-desc">預載 Node.js 22 + Docker + 9router AI 閘道，並自動全局配置與安裝 Claude Code CLI。</div>
+              </div>
+            </div>
+
+            <div class="option-item">
+              <input type="radio" name="army_type" id="opt-lobster" value="lobster" onchange="update()">
+              <div class="option-label">
+                <div class="option-header">🦀 龍蝦小兵 (Lobster Soldier)</div>
+                <div class="option-desc">工兵大隊完整環境 + 自動 Clone/配置與安裝 ClawTeam-OpenClaw 代理框架。</div>
+              </div>
+            </div>
+
+            <div class="option-item">
+              <input type="radio" name="army_type" id="opt-fresh" value="fresh" onchange="update()">
+              <div class="option-label">
+                <div class="option-header">🍃 清爽大軍 (Fresh Army)</div>
+                <div class="option-desc">極簡環境。僅拉起 Tailscale、Rootless Docker 和 9router 閘道（不預裝 Claude Code/OpenClaw）。</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="card">
+        <div class="card-title"><span></span>2. 匯出成果</div>
+        
+        <label>一鍵啟動按鈕預覽</label>
+        <div class="preview-box">
+          <div id="previewArea"></div>
+          <div class="preview-note">點擊上方按鈕可直接測試在 Project IDX (Firebase Studio) 中建立工作區</div>
+        </div>
+
+        <label>Markdown 程式碼 (貼至 README.md)</label>
+        <pre id="outputMarkdown"></pre>
+
+        <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+          <svg style="width:18px;height:18px" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
+          </svg>
+          複製 Markdown 代碼
+        </button>
+      </div>
     </div>
 
-    <script>
-        function update() {
-            const repo = document.getElementById('repoUrl').value;
-            const path = document.getElementById('blueprintPath').value;
-            const cleanRepo = repo.replace(/\/$/, "");
-            
-            // 核心邏輯：GitHub 不支援子目錄 Clone，所以我們直接指向 Repo 根目錄
-            // 並在 README 中指引使用者進入子目錄
-            const deepLink = "https://studio.firebase.google.com/import?url=" + encodeURIComponent(cleanRepo);
-            
-            const md = "[![Open in Firebase Studio](https://studio.firebase.google.com/static/images/btn_firebase_studio.svg)](" + deepLink + ")\n\n" +
-                       "> 🍤 **班主提醒**：開啟後請在終端機輸入 `cd " + path + "` 即可開始作業。";
-            
-            document.getElementById('outputMarkdown').innerText = md;
-            document.getElementById('previewArea').innerHTML = '<a href="' + deepLink + '" target="_blank"><img src="https://studio.firebase.google.com/static/images/btn_firebase_studio.svg"></a><br><p style="font-size:0.8rem; color:#888;">(預覽) 開啟後請執行 cd ' + path + '</p>';
-        }
+    <!-- Steps -->
+    <div class="steps">
+      <div class="steps-title">🛠️ 這是如何運作的？</div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-title">建立自訂範本</div>
+          <div class="step-desc">本專案根目錄已配置 <code>idx-template.json</code> 與 <code>idx-template.nix</code> 作為 Project IDX 官方支援的自訂範本規格。</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-title">使用者點擊連結</div>
+          <div class="step-desc">使用者點選按鈕時，IDX 會解析範本並在網頁中跳出選擇清單，由使用者動態挑選「清爽大軍、工兵大隊或龍蝦小兵」。</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-title">自動建置完成</div>
+          <div class="step-desc">Nix 會執行 bootstrap 腳本，拉下指定部隊組合所屬的環境配置，秒級部署出安全隔離的 Docker & AI 代理環境！</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>由 <strong>蝦家班 (shrimpclan.ai)</strong> 研製 | 基於 MIT 授權開源發布</p>
+      <p style="margin-top:0.4rem;font-size:0.75rem;color:rgba(255,255,255,0.2)">維護與更新自 2026-06-17</p>
+    </footer>
+  </div>
+
+  <script>
+    function update() {
+      const repo = document.getElementById('repoUrl').value.trim();
+      const cleanRepo = repo.replace(/\/$/, "");
+      
+      // IDX Custom Template URL
+      const deepLink = "https://idx.google.com/new?template=" + encodeURIComponent(cleanRepo);
+      
+      // Selected label to show in tip
+      const selectedRadio = document.querySelector('input[name="army_type"]:checked');
+      const armyType = selectedRadio ? selectedRadio.value : 'sapper';
+      const armyName = selectedRadio ? selectedRadio.nextElementSibling.querySelector('.option-header').innerText.split(' (')[0] : '工兵大隊';
+
+      const md = "[![Open in Firebase Studio](https://studio.firebase.google.com/static/images/btn_firebase_studio.svg)](" + deepLink + ")\n\n" +
+                 "> 🍤 **班主提醒**：點擊上方按鈕建立工作區時，可在下拉選單中選擇 **" + armyName + "** 以獲得對應的 AI 代理自動配置。";
+      
+      document.getElementById('outputMarkdown').textContent = md;
+      document.getElementById('previewArea').innerHTML = '<a href="' + deepLink + '" target="_blank"><img src="https://studio.firebase.google.com/static/images/btn_firebase_studio.svg" alt="Open in Firebase Studio"></a>';
+    }
+
+    function copyCode() {
+      const text = document.getElementById('outputMarkdown').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `
+          <svg style="width:18px;height:18px" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+          </svg>
+          已複製到剪貼簿！
+        `;
+        btn.style.background = 'linear-gradient(135deg, #2e7d32 0%, #4caf50 100%)';
+        btn.style.boxShadow = '0 4px 20px rgba(76, 175, 80, 0.2)';
         
-        function copy() {
-            const text = document.getElementById('outputMarkdown').innerText;
-            navigator.clipboard.writeText(text);
-            alert("已複製到剪貼簿！");
-        }
-        
-        update();
-    </script>
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.style.background = '';
+          btn.style.boxShadow = '';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+
+    // Auto-update on inputs
+    document.getElementById('repoUrl').addEventListener('input', update);
+    update();
+  </script>
 </body>
 </html>
