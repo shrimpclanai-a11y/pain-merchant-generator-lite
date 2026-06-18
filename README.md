@@ -16,8 +16,8 @@
    - 極簡環境。僅拉起 Rootless Docker 和 9router AI 閘道。
 2. **🧠 工兵大隊 (Sapper Brigade)**: `Docker + 9router + Claude Code`
    - 自動配置本地 `settings.json` 並全自動安裝 `@anthropic-ai/claude-code@2.1.179` CLI，享受零成本免費 AI 程式輔助。
-3. **🦀 龍蝦小兵 (Lobster Soldier)**: `Docker + 9router + OpenClaw`
-   - 工兵大隊完整環境外，全自動 Clone 並安裝 `ClawTeam-OpenClaw` 代理框架。
+3. **🦀 龍蝦小兵 (Lobster Soldier)**: `Docker + 9router + OpenClaw + ClawTeam`
+   - 工兵大隊完整環境外，全自動部署 OpenClaw 平台並安裝 `ClawTeam-OpenClaw` 多代理協調框架（上游 win4r 版）。
 
 ---
 
