@@ -30,7 +30,7 @@
 | **Tailscale 併網** | ❌ 關閉 | 將工作區加入私有 Tailnet VPN |
 | **SSH 開門 (Port 2222)** | ❌ 關閉 | 啟動 SSHD，允許特定公鑰遠端登入 |
 | **Beacon 回報** | ❌ 關閉 | 向管理伺服器回報工作區 IP 與狀態 |
-| **Docker 9router** | ✅ 啟動 | 拉取 `decolua/9router:0.5.4`，代理免費 AI 模型 |
+| **Docker 9router** | ✅ 啟動 | 拉取 `decolua/9router:0.4.71`，代理免費 AI 模型 |
 | **Claude Code** | ✅ (sapper/lobster) | 全域安裝指定版本 Claude Code CLI |
 
 ---
