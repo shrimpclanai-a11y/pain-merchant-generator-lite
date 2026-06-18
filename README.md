@@ -4,7 +4,7 @@
 
 這是蝦家班對外展示 **PAIN-000** 協議的第一陣地。本工具為「痛苦圖紙」批量出貨中心（Lite 版），也是支援 Project IDX 自訂範本的工業級一鍵部署引擎。
 
-[![Open in Project IDX](https://cdn.idx.dev/btn/open_dark_32.svg)](https://idx.google.com/new?template=https://github.com/shrimpclanai-a11y/pain-merchant-generator-lite/tree/main)
+[![Open in Project IDX](https://cdn.idx.dev/btn/open_dark_32.svg)](https://idx.google.com/new?template=https://github.com/shrimpclanai-a11y/pain-merchant-generator-lite)
 
 > 🍤 **班主提醒**：點擊上方按鈕建立工作區時，可在下拉選單中選擇 **清爽大軍、工兵大隊 或 龍蝦小兵** 以獲得對應的 AI 代理與開發沙盒自動配置。
 

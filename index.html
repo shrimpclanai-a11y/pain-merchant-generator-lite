@@ -492,10 +492,7 @@
       const repo = document.getElementById('repoUrl').value.trim();
       let cleanRepo = repo.replace(/\/$/, "");
       
-      // Auto-append default branch to bypass potential validation caching issues
-      if (cleanRepo && !cleanRepo.includes("/tree/") && !cleanRepo.includes("/blob/")) {
-        cleanRepo += "/tree/main";
-      }
+      // Removed auto-append default branch to bypass potential validation caching issues, let IDX resolve it
       
       // IDX Custom Template URL
       const deepLink = "https://idx.google.com/new?template=" + encodeURIComponent(cleanRepo);
