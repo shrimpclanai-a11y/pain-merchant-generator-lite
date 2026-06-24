@@ -211,8 +211,8 @@ phase_full() {
   "agents": {
     "defaults": {
       "workspace": "/home/node/.openclaw/workspace",
-      "model": { "primary": "9router/oc/deepseek-v4-flash-free" },
-      "models": { "9router/oc/deepseek-v4-flash-free": {} }
+      "model": { "primary": "9router/oc/nemotron-3-ultra-free" },
+      "models": { "9router/oc/nemotron-3-ultra-free": {} }
     }
   },
   "gateway": {
@@ -235,14 +235,14 @@ phase_full() {
     "mode": "merge",
     "providers": {
       "9router": {
-        "baseUrl": "http://${NINE_IP}:20128/api",
+        "baseUrl": "http://${NINE_IP}:20128/api/v1",
         "api": "openai-completions",
         "apiKey": "sk-9router",
         "models": [{
-          "id": "oc/deepseek-v4-flash-free",
-          "name": "DeepSeek V4 Flash (Free)",
+          "id": "oc/nemotron-3-ultra-free",
+          "name": "Nemotron 3 Ultra (Free)",
           "contextWindow": 128000,
-          "maxTokens": 4096,
+          "maxTokens": 8192,
           "input": ["text"],
           "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
           "reasoning": true
@@ -276,12 +276,14 @@ DOCKERFILE
 
   # ── 5. 啟動 OpenClaw ────────────────────────────────
   sep
-  info "📌 步驟 4/5：啟動 OpenClaw 容器（雙埠映射）"
+  info "📌 步驟 4/5：啟動 OpenClaw 容器（雙埠映射、掛載 Volume）"
   docker rm -f openclaw 2>/dev/null || true
   docker run -d --name openclaw --restart=unless-stopped \
+    --network pain-net \
     -p 3000:3000 -p 18789:18789 \
+    -v openclaw-data:/home/node/.openclaw \
     -e OPENCLAW_TEMP_DIR="/tmp/openclaw" \
-    openclaw:local sh -c "openclaw gateway run --force" > /dev/null
+    openclaw:local sh -c "openclaw gateway run" > /dev/null
 
   sleep 12
   STATUS=$(docker ps --filter name=openclaw --format "{{.Status}}" 2>/dev/null || echo "失敗")
@@ -307,7 +309,7 @@ DOCKERFILE
   docker exec openclaw sh -c "curl -s http://${NINE_IP}:20128/api/v1/chat/completions \
     -H 'Content-Type: application/json' \
     -H 'Authorization: Bearer sk-9router' \
-    -d '{\"model\":\"oc/deepseek-v4-flash-free\",\"messages\":[{\"role\":\"user\",\"content\":\"Say 蝦\"}],\"max_tokens\":100}'" 2>&1 | grep -o '"content":"[^"]*"'
+    -d '{\"model\":\"oc/nemotron-3-ultra-free\",\"messages\":[{\"role\":\"user\",\"content\":\"Say 蝦\"}],\"max_tokens\":100}'" 2>&1 | grep -o '"content":"[^"]*"'
 
   # ── 完成 ──────────────────────────────────────────────
   sep
@@ -350,14 +352,16 @@ fix_api_key() {
 
 fix_crash() {
   sep
-  info "🩺 修復：重建 OpenClaw 容器"
+  info "🩺 修復：重建 OpenClaw 容器（掛載 Volume）"
   export DOCKER_HOST="${DOCKER_HOST:-unix:///tmp/run-1000/docker.sock}"
   docker rm -f openclaw 2>/dev/null || true
   docker build -t openclaw:local -f /tmp/Dockerfile.openclaw /tmp/. 2>&1 | tail -3
   docker run -d --name openclaw --restart=unless-stopped \
+    --network pain-net \
     -p 3000:3000 -p 18789:18789 \
+    -v openclaw-data:/home/node/.openclaw \
     -e OPENCLAW_TEMP_DIR="/tmp/openclaw" \
-    openclaw:local sh -c "openclaw gateway run --force" > /dev/null
+    openclaw:local sh -c "openclaw gateway run" > /dev/null
   sleep 10
   docker ps --filter name=openclaw --format "✅ OpenClaw: {{.Status}}"
 }
@@ -381,15 +385,13 @@ EOF
 
 fix_9router_ip() {
   sep
-  info "🌐 修復：更新 9router IP"
+  info "🌐 修復：更新 9router baseUrl 為 Docker DNS"
   export DOCKER_HOST="${DOCKER_HOST:-unix:///tmp/run-1000/docker.sock}"
-  NINE_IP=$(docker inspect 9router --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
-  info "9router 新 IP = ${NINE_IP}"
   if docker ps --filter name=openclaw --format '{{.Names}}' | grep -q openclaw; then
     docker exec openclaw sh -c "cat /home/node/.openclaw/openclaw.json" | \
-      python3 -c "import sys,json; d=json.load(sys.stdin); d['models']['providers']['9router']['baseUrl']='http://${NINE_IP}:20128/api'; print(json.dumps(d,indent=2))" | \
+      python3 -c "import sys,json; d=json.load(sys.stdin); d['models']['providers']['9router']['baseUrl']='http://9router:20128/api/v1'; print(json.dumps(d,indent=2))" | \
       docker exec -i openclaw sh -c "cat > /home/node/.openclaw/openclaw.json"
-    ok "baseUrl 已更新為 http://${NINE_IP}:20128/api"
+    ok "baseUrl 已更新為 http://9router:20128/api/v1"
     warn "請重啟 OpenClaw 容器套用變更"
   else
     fail "OpenClaw 未執行，無法更新"
