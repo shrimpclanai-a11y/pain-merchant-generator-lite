@@ -278,6 +278,11 @@ DOCKERFILE
   sep
   info "📌 步驟 4/5：啟動 OpenClaw 容器（雙埠映射、掛載 Volume）"
   docker rm -f openclaw 2>/dev/null || true
+  # 預修復 Volume 權限（Trap 13: /npm/projects EACCES）
+  docker run --rm -v openclaw-data:/data alpine sh -c '
+    mkdir -p /data/npm/projects /data/workspace /data/logs
+    chown -R 1000:1000 /data
+  ' 2>/dev/null || true
   docker run -d --name openclaw --restart=unless-stopped \
     --network pain-net \
     -p 3000:3000 -p 18789:18789 \
@@ -356,6 +361,11 @@ fix_crash() {
   export DOCKER_HOST="${DOCKER_HOST:-unix:///tmp/run-1000/docker.sock}"
   docker rm -f openclaw 2>/dev/null || true
   docker build -t openclaw:local -f /tmp/Dockerfile.openclaw /tmp/. 2>&1 | tail -3
+  # 預修復 Volume 權限（Trap 13: /npm/projects EACCES）
+  docker run --rm -v openclaw-data:/data alpine sh -c '
+    mkdir -p /data/npm/projects /data/workspace /data/logs
+    chown -R 1000:1000 /data
+  ' 2>/dev/null || true
   docker run -d --name openclaw --restart=unless-stopped \
     --network pain-net \
     -p 3000:3000 -p 18789:18789 \

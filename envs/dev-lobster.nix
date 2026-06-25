@@ -283,10 +283,16 @@ DEOF
       rm -rf /tmp/.openclaw && cp -r /tmp/openclaw-config /tmp/.openclaw
       docker build -t openclaw:local -f /tmp/Dockerfile.openclaw /tmp/. > /tmp/openclaw-build.log 2>&1
 
-      # 5f. 啟動 OpenClaw（修復陷阱 #4:entrypoint #5:雙埠映射）
+      # 5f. 啟動 OpenClaw（修復陷阱 #4:entrypoint #5:雙埠映射 #13:Volume 權限）
       if docker ps -a --format '{{.Names}}' | grep -qx 'openclaw'; then
         docker rm -f openclaw > /dev/null 2>&1
       fi
+
+      # 預修復 Volume 權限（Trap 13: /npm/projects EACCES）
+      docker run --rm -v openclaw-data:/data alpine sh -c '
+        mkdir -p /data/npm/projects /data/workspace /data/logs
+        chown -R 1000:1000 /data
+      ' 2>/dev/null || true
 
       docker run -d \
         --name openclaw \
